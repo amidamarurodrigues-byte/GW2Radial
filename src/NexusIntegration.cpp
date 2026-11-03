@@ -21,9 +21,6 @@ namespace
 
 // Nexus identifiers must be unique across addons, hence the prefix.
 constexpr const char* KB_SETTINGS     = "KB_GW2RADIAL_SETTINGS";
-constexpr const char* QA_SETTINGS     = "QA_GW2RADIAL_SETTINGS";
-constexpr const char* TEX_ICON        = "TEX_GW2RADIAL_ICON";
-constexpr const char* TEX_ICON_HOVER  = "TEX_GW2RADIAL_ICON_HOVER";
 
 // Not on Raidcore, so this has to be an arbitrary integer nobody else is likely to use ("GW2R").
 constexpr uint32_t    AddonSignature  = 0x47573252;
@@ -31,8 +28,6 @@ constexpr uint32_t    AddonSignature  = 0x47573252;
 HMODULE               g_module = nullptr;
 AddonAPI_t*           g_api    = nullptr;
 
-std::unique_ptr<ConfigurationOption<bool>> g_hideQuickAccess;
-bool                  g_quickAccessAdded = false;
 bool                  g_swapChainInitialized = false;
 
 // Callbacks arrive on the render and window threads while Nexus may unload us at any time. Callbacks hold this shared (and
@@ -121,49 +116,14 @@ void OnSettingsKeybind(const char* /*identifier*/, bool isRelease)
         SettingsMenu::i().MakeVisible();
 }
 
-void ShowQuickAccess()
-{
-    if (g_quickAccessAdded)
-        return;
-
-    const auto icon      = LoadResource(g_module, IDR_NEXUS_ICON);
-    const auto iconHover = LoadResource(g_module, IDR_NEXUS_ICON_HOVER);
-    if (!icon.data() || !iconHover.data())
-        return;
-
-    g_api->Textures_GetOrCreateFromMemory(TEX_ICON, icon.data(), icon.size());
-    g_api->Textures_GetOrCreateFromMemory(TEX_ICON_HOVER, iconHover.data(), iconHover.size());
-    g_api->QuickAccess_Add(QA_SETTINGS, TEX_ICON, TEX_ICON_HOVER, KB_SETTINGS, "GW2Radial settings");
-    g_quickAccessAdded = true;
-}
-
-void HideQuickAccess()
-{
-    if (!g_quickAccessAdded)
-        return;
-
-    g_api->QuickAccess_Remove(QA_SETTINGS);
-    g_quickAccessAdded = false;
-}
-
 // Drawn by Nexus inside its options window (with Nexus' ImGui, hence the separate translation unit).
 void OnOptionsRender()
 {
     std::shared_lock lock(g_lifetime, std::try_to_lock);
-    if (!lock.owns_lock() || !g_api || !g_hideQuickAccess)
+    if (!lock.owns_lock() || !g_api)
         return;
 
-    bool hide = g_hideQuickAccess->value();
-
-    const auto actions = NexusOptionsUI::Draw(hide);
-
-    if (actions.hideIconChanged)
-    {
-        g_hideQuickAccess->value(hide);
-        hide ? HideQuickAccess() : ShowQuickAccess();
-    }
-
-    if (actions.openSettings && GetBaseCore().ready())
+    if (NexusOptionsUI::Draw() && GetBaseCore().ready())
         SettingsMenu::i().MakeVisible();
 }
 
@@ -175,8 +135,6 @@ void Load(AddonAPI_t* api)
 
     GW2Radial::Core::Init(g_module);
 
-    g_hideQuickAccess = std::make_unique<ConfigurationOption<bool>>("Hide quick access icon", "hide_quick_access_icon", "Nexus", false);
-
     NexusOptionsUI::Init(api->ImguiContext, api->ImguiMalloc, api->ImguiFree);
 
     api->GUI_Register(RT_PostRender, OnPostRender);
@@ -184,18 +142,14 @@ void Load(AddonAPI_t* api)
     api->WndProc_Register(OnWndProc);
 
     // No default binding: the settings window already opens with Shift+Alt+M through the addon's own keybind. This entry
-    // exists so that it can be bound from Nexus' keybind menu and so that the quick access icon has something to invoke.
+    // exists so that it can be bound from Nexus' keybind menu.
     api->InputBinds_RegisterWithString(KB_SETTINGS, OnSettingsKeybind, "(null)");
-
-    if (!g_hideQuickAccess->value())
-        ShowQuickAccess();
 
     NexusLog(LOGL_INFO, "Loaded.");
 }
 
 void Unload()
 {
-    HideQuickAccess();
     g_api->InputBinds_Deregister(KB_SETTINGS);
     g_api->WndProc_Deregister(OnWndProc);
     g_api->GUI_Deregister(OnOptionsRender);
@@ -204,7 +158,6 @@ void Unload()
     // Wait for callbacks that were already running; any later call finds the lock taken (or g_api cleared) and does nothing.
     std::unique_lock lock(g_lifetime);
 
-    g_hideQuickAccess.reset();
     BaseCore::Shutdown();
     g_logStream.close();
 

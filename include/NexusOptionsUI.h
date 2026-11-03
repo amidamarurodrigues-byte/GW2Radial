@@ -8,13 +8,7 @@ namespace NexusOptionsUI
 // Hooks the ImGui copy used here up to the context and allocators Nexus hands to addons.
 void Init(void* imguiContext, void* imguiMalloc, void* imguiFree);
 
-struct Actions
-{
-    bool hideIconChanged = false;
-    bool openSettings    = false;
-};
-
-// Call from Nexus' options render callback.
-Actions Draw(bool& hideQuickAccessIcon);
+// Call from Nexus' options render callback. Returns true on the frame the "Open settings" button is clicked.
+bool Draw();
 
 } // namespace NexusOptionsUI

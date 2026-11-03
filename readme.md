@@ -29,7 +29,7 @@ This is the Nexus build of GW2Radial. It runs on [Nexus](https://github.com/Raid
 
 Your settings, keybinds and custom wheels live in ``addons\gw2radial`` (``config.ini``) and are picked up as they were, so you do not need to reconfigure anything.
 
-The settings window opens with Shift+Alt+M, from the GW2Radial icon in the Nexus quick access bar, or from a key bound to *GW2Radial settings* in Nexus' keybind menu.
+The settings window opens with Shift+Alt+M, from the *Open GW2Radial settings* button in the addon's Nexus options, or from a key bound to *GW2Radial settings* in Nexus' keybind menu.
 
 #### Linux Support
 GW2Radial is **not** developed to support Linux, but with a simple tweak you can get radial working.

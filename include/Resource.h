@@ -3,8 +3,6 @@
 
 #define IDR_BG        200
 
-#define IDR_NEXUS_ICON       201
-#define IDR_NEXUS_ICON_HOVER 202
 
 #define IDR_MOUNTS    211
 #define IDR_MOUNT1    211

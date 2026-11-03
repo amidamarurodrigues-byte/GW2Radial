@@ -20,17 +20,16 @@ An [*ArenaNET-approved<sup>TM</sup>*](https://www.reddit.com/r/Guildwars2/commen
 
 ## Installation
 
-### Automatic Installation
-- Download the [GW2 Addon Manager](https://github.com/gw2-addon-loader/GW2-Addon-Manager).
-- From the list of addons, select GW2Radial.
-- Click Update.
-- Run the game!
+This is the Nexus build of GW2Radial. It runs on [Nexus](https://github.com/RaidcoreGG/Nexus) and needs neither the addon loader nor the d3d wrapper.
 
-### Manual Installation
-- Install the [addon loader](https://github.com/gw2-addon-loader/loader-core) and [d3d wrapper](https://github.com/gw2-addon-loader/d3d9_wrapper).
-- Download and extract the archive ``gw2radial.zip`` found in the [latest release](https://github.com/Friendly0Fire/GW2Radial/releases/latest).
-- Place ``gw2addon_gw2radial.dll`` in your addons folder inside a new folder named `gw2radial` (with the default game install path, this would be ``C:\Program Files\Guild Wars 2\addons\gw2radial``).
-- Run the game! If everything was setup properly, you should be greeted by a prompt on your first launch.
+- Install [Nexus](https://raidcore.gg/Nexus).
+- Remove the old build if you had one: ``addons\gw2radial\gw2addon_gw2radial.dll`` (leave the rest of that folder in place).
+- Copy ``GW2Radial.dll`` into your game's ``addons`` folder (with the default install path, ``C:\Program Files\Guild Wars 2\addons``).
+- Run the game, open the Nexus library and make sure GW2Radial is enabled. It can be loaded and unloaded while the game is running.
+
+Your settings, keybinds and custom wheels live in ``addons\gw2radial`` (``config.ini``) and are picked up as they were, so you do not need to reconfigure anything.
+
+The settings window opens with Shift+Alt+M, from the GW2Radial icon in the Nexus quick access bar, or from a key bound to *GW2Radial settings* in Nexus' keybind menu.
 
 #### Linux Support
 GW2Radial is **not** developed to support Linux, but with a simple tweak you can get radial working.
@@ -72,11 +71,9 @@ A: I do this for fun/because I wanted this to exist. If you really want to, feel
 
 A: There can be a lot of reasons for this. Try the following debugging steps:
 
-1. Look in your Guild Wars 2 installation folder for a file named ``gw2radial.log``.
-2. If it exists, look inside the log file for details on what might be going wrong. If you cannot find anything, also look if there are files of the format ``gw2radial_*.dmp``. If those exist, the addon is loading but crashing at some point. Zip up the files and provide upload them somewhere safe, then open an issue.
-3. If it does not exist, look for a file named ``gw2al_log.txt``.
-4. If it does not exist, your addon loader is not installed correctly. Head over to the [addon loader](https://github.com/gw2-addon-loader/loader-core) project for support.
-5. Inside the log file, look for the line "Loaded gw2radial". If it is not present, the addon loader cannot load the addon correctly. Make sure you have installed the [d3d wrapper](https://github.com/gw2-addon-loader/d3d9_wrapper) addon and look at the other log messages for information on what might be going wrong.
+1. Look in ``<Guild Wars 2>\addons\gw2radial`` for a file named ``gw2radial.log``.
+2. If it exists, look inside the log file for details on what might be going wrong. Also check Nexus' own log window and ``Nexus.log`` for a "GW2Radial" entry.
+3. If it does not exist, the addon was not loaded: make sure ``GW2Radial.dll`` is directly in the ``addons`` folder and enabled in the Nexus library.
 
 If all else fails, please open an issue or [reach out on Discord](https://discord.gg/NrnW29fVpn).
 

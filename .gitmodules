@@ -1,3 +1,21 @@
-[submodule "extern/GW2Common"]
-	path = extern/GW2Common
-	url = git@github.com:Friendly0Fire/GW2Common.git
+[submodule "extern/GW2Common/extern/IconFontCppHeaders"]
+	path = extern/GW2Common/extern/IconFontCppHeaders
+	url = https://github.com/juliettef/IconFontCppHeaders
+[submodule "extern/GW2Common/extern/imgui"]
+	path = extern/GW2Common/extern/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "extern/GW2Common/extern/imgui-knobs"]
+	path = extern/GW2Common/extern/imgui-knobs
+	url = https://github.com/altschuler/imgui-knobs.git
+[submodule "extern/GW2Common/extern/loader-core"]
+	path = extern/GW2Common/extern/loader-core
+	url = https://github.com/gw2-addon-loader/loader-core.git
+[submodule "extern/GW2Common/extern/d3d9_wrapper"]
+	path = extern/GW2Common/extern/d3d9_wrapper
+	url = https://github.com/gw2-addon-loader/d3d9_wrapper.git
+[submodule "extern/nexus-api"]
+	path = extern/nexus-api
+	url = https://github.com/RaidcoreGG/RCGG-lib-nexus-api.git
+[submodule "extern/nexus-mumble"]
+	path = extern/nexus-mumble
+	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api.git

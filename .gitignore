@@ -263,6 +263,5 @@ __pycache__/
 int/
 temp/
 
-include/Version.h
 
 vcpkg_installed

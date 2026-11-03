@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="extern\imgui-knobs\imgui-knobs.cpp" />
+    <ClCompile Include="extern\imgui\backends\imgui_impl_dx11.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\backends\imgui_impl_win32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="extern\imgui\imgui.cpp" />
+    <ClCompile Include="extern\imgui\imgui_draw.cpp" />
+    <ClCompile Include="extern\imgui\imgui_tables.cpp" />
+    <ClCompile Include="extern\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="extern\imgui\misc\freetype\imgui_freetype.cpp" />
+    <ClCompile Include="include\Assertions.cpp" />
+    <ClCompile Include="src\ActivationKeybind.cpp" />
+    <ClCompile Include="src\BaseCore.cpp" />
+    <ClCompile Include="src\Condition.cpp" />
+    <ClCompile Include="src\ConfigurationFile.cpp" />
+    <ClCompile Include="src\FileSystem.cpp" />
+    <ClCompile Include="src\GFXSettings.cpp" />
+    <ClCompile Include="src\Graphics.cpp" />
+    <ClCompile Include="src\ImGuiExtensions.cpp" />
+    <ClCompile Include="src\ImGuiImplDX11.cpp" />
+    <ClCompile Include="src\ImGuiPopup.cpp" />
+    <ClCompile Include="src\imgui_impl_win32_.cpp" />
+    <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\Keybind.cpp" />
+    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\Minidump.cpp" />
+    <ClCompile Include="src\MiscTab.cpp" />
+    <ClCompile Include="src\MumbleLink.cpp" />
+    <ClCompile Include="src\ScanCode.cpp" />
+    <ClCompile Include="src\SettingsMenu.cpp" />
+    <ClCompile Include="src\ShaderManager.cpp" />
+    <ClCompile Include="src\Singleton.cpp" />
+    <ClCompile Include="src\StackWalker.cpp" />
+    <ClCompile Include="src\UpdateCheck.cpp" />
+    <ClCompile Include="src\Utility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="extern\imgui-knobs\imgui-knobs.h" />
+    <ClInclude Include="extern\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="extern\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="extern\imgui\imgui.h" />
+    <ClInclude Include="extern\imgui\imgui_internal.h" />
+    <ClInclude Include="extern\imgui\imstb_rectpack.h" />
+    <ClInclude Include="extern\imgui\imstb_textedit.h" />
+    <ClInclude Include="extern\imgui\imstb_truetype.h" />
+    <ClInclude Include="extern\imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="include\ActivationKeybind.h" />
+    <ClInclude Include="include\Assertions.h" />
+    <ClInclude Include="include\BaseCore.h" />
+    <ClInclude Include="include\baseresource.h" />
+    <ClInclude Include="include\Common.h" />
+    <ClInclude Include="include\Condition.h" />
+    <ClInclude Include="include\ConfigurationFile.h" />
+    <ClInclude Include="include\ConfigurationOption.h" />
+    <ClInclude Include="include\EnumUtils.h" />
+    <ClInclude Include="include\Event.h" />
+    <ClInclude Include="include\FileSystem.h" />
+    <ClInclude Include="include\GFXSettings.h" />
+    <ClInclude Include="include\Graphics.h" />
+    <ClInclude Include="include\imcfg.h" />
+    <ClInclude Include="include\ImGuiExtensions.h" />
+    <ClInclude Include="include\ImGuiImplDX11.h" />
+    <ClInclude Include="include\ImGuiPopup.h" />
+    <ClInclude Include="include\Input.h" />
+    <ClInclude Include="include\Keybind.h" />
+    <ClInclude Include="include\KeyCombo.h" />
+    <ClInclude Include="include\Log.h" />
+    <ClInclude Include="include\MiscTab.h" />
+    <ClInclude Include="include\MumbleLink.h" />
+    <ClInclude Include="include\renderdoc_app.h" />
+    <ClInclude Include="include\ScanCode.h" />
+    <ClInclude Include="include\SettingsMenu.h" />
+    <ClInclude Include="include\ShaderManager.h" />
+    <ClInclude Include="include\Singleton.h" />
+    <ClInclude Include="include\StackWalker.h" />
+    <ClInclude Include="include\UpdateCheck.h" />
+    <ClInclude Include="include\Utility.h" />
+    <ClInclude Include="include\Win.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BaseResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\CinzelDecorative-Bold.ttf" />
+    <Font Include="fonts\consolas.ttf" />
+    <Font Include="fonts\fa-solid-900.ttf" />
+    <Font Include="fonts\SourceSansPro-Black.ttf" />
+    <Font Include="fonts\SourceSansPro-Italic.ttf" />
+    <Font Include="fonts\SourceSansPro-Regular.ttf" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1ad7929b-fe1e-4fa2-be57-df9b0fc1526d}</ProjectGuid>
+    <RootNamespace>GW2Common</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)extern\;$(ProjectDir)extern\imgui\;$(IncludePath)</IncludePath>
+    <SourcePath>$(ProjectDir)src;$(SourcePath)</SourcePath>
+    <IntDir>$(SolutionDir)int\$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)include\;$(ProjectDir)extern\;$(ProjectDir)extern\imgui\;$(IncludePath)</IncludePath>
+    <SourcePath>$(ProjectDir)src;$(SourcePath)</SourcePath>
+    <IntDir>$(SolutionDir)int\$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IMGUI_USER_CONFIG=&lt;imcfg.h&gt;;NOMINMAX;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Comctl32.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IMGUI_USER_CONFIG=&lt;imcfg.h&gt;;NOMINMAX;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Comctl32.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+  <Import Condition=" '$(VCPKG_INSTALLATION_ROOT)' != '' " Project="$(VCPKG_INSTALLATION_ROOT)\scripts\buildsystems\msbuild\vcpkg.targets" />
+</Project>

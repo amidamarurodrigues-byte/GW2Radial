@@ -1,0 +1,345 @@
+#include "Condition.h"
+
+#include <array>
+#include <sstream>
+#include <utility>
+
+#include "MumbleLink.h"
+
+void ConditionContext::Populate() {
+    const auto& ml = MumbleLink::i();
+
+    inCombat = ml.isInCombat();
+    inWvW = ml.isInWvW();
+    underwater = ml.isUnderwater();
+    profession = ml.characterProfession();
+    character = std::wstring(ml.characterName());
+    elitespec = ml.characterSpecialization();
+}
+
+template<typename T>
+bool MakeConditionIf(const std::string& type, u32 id, std::unique_ptr<Condition>& cond) {
+    if(type == T::Nickname) {
+        cond = std::make_unique<T>(id);
+        return true;
+    }
+
+    return false;
+}
+
+bool IsProfessionCondition::DrawInnerMenu() {
+    auto suffix = "##condition_profession_" + std::to_string(id_);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+
+    i32 comboVal = static_cast<i32>(profession_) - 1;
+    const char* items = "Guardian\0Warrior\0Engineer\0Ranger\0Thief\0Elementalist\0Mesmer\0Necromancer\0Revenant\0";
+
+    if(ImGui::Combo(suffix.c_str(), &comboVal, items)) {
+        profession_ = static_cast<MumbleLink::Profession>(comboVal + 1);
+        ImGui::PopItemWidth();
+        return true;
+    }
+
+    ImGui::PopItemWidth();
+    return false;
+}
+
+bool IsEliteSpecCondition::DrawInnerMenu() {
+    auto suffix = "##condition_elitespec_" + std::to_string(id_);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+
+    i32 comboVal = static_cast<i32>(elitespec_);
+    const char* items =
+        "No "
+        "Elite\0Berserker\0Bladesworn\0Catalyst\0Chronomancer\0Daredevil\0Deadeye\0Dragonhunter\0Druid\0Firebrand\0Harbinger\0Herald\0Holos"
+        "mith\0Mechanist\0Mirage\0Reaper\0Renegade\0Scourge\0Scrapper\0Soulbeast\0Specter\0Spellbreaker\0Tempest\0Untamed\0Vindicator\0Virt"
+        "uoso\0Weaver\0Willbender\0";
+
+    if(ImGui::Combo(suffix.c_str(), &comboVal, items)) {
+        elitespec_ = static_cast<MumbleLink::EliteSpec>(comboVal);
+        ImGui::PopItemWidth();
+        return true;
+    }
+
+    ImGui::PopItemWidth();
+    return false;
+}
+
+bool IsCharacterCondition::DrawInnerMenu() {
+    auto suffix = "##condition_profession_" + std::to_string(id_);
+    ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+
+    auto utf8name = utf8_encode(characterName_);
+    std::array<char, 256> buf;
+    std::copy(utf8name.begin(), utf8name.end(), buf.begin());
+    buf[std::min(utf8name.size(), buf.size() - 1)] = '\0';
+
+    if(ImGui::InputText(suffix.c_str(), buf.data(), buf.size() - 1)) {
+        characterName_ = utf8_decode(std::string(buf.data()));
+        ImGui::PopItemWidth();
+        return true;
+    }
+
+    ImGui::PopItemWidth();
+    return false;
+}
+
+void ConditionSet::Load() {
+    const char* c = category_.c_str();
+    const auto& ini = INIConfigurationFile::i().ini();
+
+    const char* set = ini.GetValue(c, "condition_set", "");
+    if(strlen(set) == 0)
+        return;
+
+    std::list<std::string> setList;
+    SplitString(set, ",", std::back_inserter(setList));
+    for(const auto& item : setList) {
+        if(item.find('/') == std::string::npos) { }
+        else {
+            std::vector<std::string> itemElems(3);
+            SplitString(Trim(item).c_str(), "/", itemElems.begin());
+            ConditionOp op = ConditionOp::None;
+
+            if(itemElems[0] == "OR")
+                op = ConditionOp::Or;
+            else if(itemElems[0] == "AND")
+                op = ConditionOp::And;
+
+            u32 id = std::stol(itemElems[1]);
+            std::unique_ptr<Condition> cond;
+
+            // Use boolean operator to i16-circuit evaluation
+            MakeConditionIf<IsInCombatCondition>(itemElems[2], id, cond) || MakeConditionIf<IsWvWCondition>(itemElems[2], id, cond) ||
+                MakeConditionIf<IsUnderwaterCondition>(itemElems[2], id, cond) ||
+                MakeConditionIf<IsProfessionCondition>(itemElems[2], id, cond) ||
+                MakeConditionIf<IsEliteSpecCondition>(itemElems[2], id, cond) ||
+                MakeConditionIf<IsCharacterCondition>(itemElems[2], id, cond);
+
+            cond->Load(c);
+
+            conditions_.push_back({ op, std::move(cond) });
+        }
+    }
+
+    if(conditions_.empty())
+        return;
+
+    if(conditions_.front().prevOp != ConditionOp::None) {
+        conditions_.front().prevOp = ConditionOp::None;
+        Save();
+    }
+}
+
+ConditionSet::ConditionSet(std::string category) : category_(std::move(category)) { Load(); }
+
+bool ConditionSet::passes() const {
+    if(!enabled_)
+        return true;
+
+    ConditionContext cc;
+    cc.Populate();
+
+    bool result = true;
+
+    for(const auto& c : conditions_) {
+        if(c.prevOp == ConditionOp::And)
+            result = result && c.condition->passes(cc);
+        else if(c.prevOp == ConditionOp::Or)
+            result = result || c.condition->passes(cc);
+        else
+            result = c.condition->passes(cc);
+    }
+
+    return result;
+}
+
+void ConditionSet::Save() const {
+    const char* cat = category_.c_str();
+
+    std::stringstream set;
+
+    for(const auto& c : conditions_) {
+        c.condition->Save(cat);
+        switch(c.prevOp) {
+        case ConditionOp::Or:
+            set << "OR/";
+            break;
+        case ConditionOp::And:
+            set << "AND/";
+            break;
+        case ConditionOp::None:
+        default:
+            set << "NONE/";
+        }
+        set << c.condition->id() << "/" << c.condition->nickname() << ", ";
+    }
+
+    INIConfigurationFile::i().ini().SetValue(cat, "condition_set", set.str().substr(0, set.str().size() - 2).c_str());
+}
+
+bool Condition::DrawMenu(const char* category, MenuResult& mr, bool isFirst, bool isLast) {
+    bool dirty = false;
+
+    std::string suffix = std::string("##") + nickname() + std::to_string(id());
+
+    bool prevNegate = negate();
+
+    if(ImGui::RadioButton(("is" + suffix).c_str(), !negate_))
+        negate_ = false;
+    ImGui::SameLine();
+
+    if(ImGui::RadioButton(("isn't" + suffix).c_str(), negate_))
+        negate_ = true;
+    ImGui::SameLine();
+
+    if(prevNegate != negate_)
+        dirty = true;
+
+    dirty = dirty || DrawInnerMenu();
+
+    mr = MenuResult::Nothing;
+
+    ImGui::SameLine();
+
+    ImGui::PushFont(GetBaseCore().font());
+
+    std::u8string suffixu8(reinterpret_cast<const char8_t*>(suffix.c_str()));
+
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.75f);
+
+    if(ImGui::Button(reinterpret_cast<const char*>((reinterpret_cast<const char8_t*>(ICON_FA_TIMES) + suffixu8).c_str())))
+        mr = MenuResult::DeleteItem;
+
+    if(!isFirst) {
+        ImGui::SameLine();
+        if(ImGui::Button(reinterpret_cast<const char*>((reinterpret_cast<const char8_t*>(ICON_FA_ARROW_UP) + suffixu8).c_str())))
+            mr = MenuResult::MoveUp;
+    }
+
+    if(!isLast) {
+        ImGui::SameLine();
+        if(ImGui::Button(reinterpret_cast<const char*>((reinterpret_cast<const char8_t*>(ICON_FA_ARROW_DOWN) + suffixu8).c_str())))
+            mr = MenuResult::MoveDown;
+    }
+
+    ImGui::PopFont();
+
+    if(dirty)
+        Save(category);
+
+    return dirty;
+}
+
+bool ConditionSet::ConditionOperatorMenu(ConditionOp& op, u32 id) const {
+    auto suffix = "##condition_operator_" + std::to_string(id);
+
+    ImGui::PushItemWidth(0.2f * ImGui::GetWindowWidth());
+
+    i32 comboVal = std::max(0, static_cast<i32>(op) - 1);
+    if(ImGui::Combo(suffix.c_str(), &comboVal, "or if...\0and if...\0")) {
+        op = static_cast<ConditionOp>(comboVal + 1);
+        return true;
+    }
+
+    ImGui::PopItemWidth();
+
+    return false;
+}
+
+std::unique_ptr<Condition> ConditionSet::CreateCondition(u32 id) const {
+    switch(newConditionComboSel_) {
+    case 0:
+        return std::make_unique<IsInCombatCondition>(id);
+    case 1:
+        return std::make_unique<IsWvWCondition>(id);
+    case 2:
+        return std::make_unique<IsUnderwaterCondition>(id);
+    case 3:
+        return std::make_unique<IsProfessionCondition>(id);
+    case 4:
+        return std::make_unique<IsEliteSpecCondition>(id);
+    case 5:
+        return std::make_unique<IsCharacterCondition>(id);
+    default:
+        return nullptr;
+    }
+}
+
+void ConditionSet::DrawMenu() {
+    bool dirty = false;
+    ImGui::Text("Only enable keybinds if character...");
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y * 2));
+
+    u32 id = 0;
+
+    for(auto it = conditions_.begin(); it != conditions_.end();) {
+        if(id > 0) {
+            dirty |= ConditionOperatorMenu(it->prevOp, id);
+            ImGui::Spacing();
+        }
+        else if(it->prevOp != ConditionOp::None) {
+            dirty = true;
+            it->prevOp = ConditionOp::None;
+        }
+
+        bool isFirst = it == conditions_.begin();
+        bool isLast = conditions_.size() <= 1 || it == --conditions_.end();
+
+        MenuResult mr;
+        dirty |= it->condition->DrawMenu(category_.c_str(), mr, isFirst, isLast);
+
+        ImGui::Spacing();
+
+        switch(mr) {
+        case MenuResult::DeleteItem:
+            it = conditions_.erase(it);
+            dirty = true;
+            break;
+        case MenuResult::MoveUp:
+            if(!isFirst) {
+                auto itPrev = it;
+                --itPrev;
+                std::iter_swap(it, itPrev);
+                dirty = true;
+            }
+            break;
+        case MenuResult::MoveDown:
+            if(!isLast) {
+                auto itNext = it;
+                ++itNext;
+                std::iter_swap(it, itNext);
+                dirty = true;
+            }
+            break;
+        default:
+            break;
+        }
+
+        if(mr != MenuResult::DeleteItem)
+            ++it;
+
+        id++;
+    }
+
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Separator();
+    const char* items = "In combat\0In WvW\0Underwater\0Is profession\0Is elite spec\0Is character\0";
+    ImGui::Combo("##NewConditionCombo", &newConditionComboSel_, items);
+
+    ImGui::SameLine();
+
+    if(ImGui::Button("Add Condition")) {
+        conditions_.push_back({ ConditionOp::Or, CreateCondition(id) });
+        dirty = true;
+    }
+
+    if(dirty) {
+        Save();
+        INIConfigurationFile::i().Save();
+    }
+
+    ImGui::PopStyleVar();
+}

@@ -46,19 +46,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(SolutionDir)extern\GW2Common\include;$(SolutionDir)extern\GW2Common\extern;$(SolutionDir)extern\GW2Common\extern\imgui;$(SolutionDir)extern\GW2Common\extern\d3d9_wrapper\include;$(SolutionDir)extern\GW2Common\extern\loader-core\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(SolutionDir)extern\GW2Common\include;$(SolutionDir)extern\GW2Common\extern;$(SolutionDir)extern\GW2Common\extern\imgui;$(SolutionDir)extern\nexus-api;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(ProjectDir)src\;$(SourcePath)</SourcePath>
-    <TargetName>gw2addon_gw2radial</TargetName>
+    <TargetName>GW2Radial</TargetName>
     <IntDir>$(SolutionDir)int\$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(SolutionDir)extern\GW2Common\include;$(SolutionDir)extern\GW2Common\extern;$(SolutionDir)extern\GW2Common\extern\imgui;$(SolutionDir)extern\GW2Common\extern\d3d9_wrapper\include;$(SolutionDir)extern\GW2Common\extern\loader-core\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(SolutionDir)extern\GW2Common\include;$(SolutionDir)extern\GW2Common\extern;$(SolutionDir)extern\GW2Common\extern\imgui;$(SolutionDir)extern\nexus-api;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(ProjectDir)src\;$(SourcePath)</SourcePath>
-    <TargetName>gw2addon_gw2radial</TargetName>
+    <TargetName>GW2Radial</TargetName>
     <IntDir>$(SolutionDir)int\$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -87,12 +87,11 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Wininet.lib;Shlwapi.lib;d3dcompiler.lib;WindowsCodecs.lib;$(SolutionDir)int\GW2Common\$(Platform)\$(Configuration)\BaseResource.res;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>$(SolutionDir)Main.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>if exist "$(GW2RADIAL_TARGET_DIR)" (
-  copy /Y $(TargetPath) "$(GW2RADIAL_TARGET_DIR)\addons\gw2radial\$(TargetName).dll"
-  copy /Y $(OutDir)$(TargetName).pdb "$(GW2RADIAL_TARGET_DIR)\addons\gw2radial\$(TargetName).pdb"
+  copy /Y $(TargetPath) "$(GW2RADIAL_TARGET_DIR)\addons\$(TargetName).dll"
+  copy /Y $(OutDir)$(TargetName).pdb "$(GW2RADIAL_TARGET_DIR)\addons\$(TargetName).pdb"
 ) else (
   echo No target defined, skipping copy. To setup automatic copy, define environment variable GW2RADIAL_TARGET_DIR to your GW2 root install directory.
 )</Command>
@@ -128,12 +127,11 @@ cd "$(ProjectDir)shaders"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Wininet.lib;Shlwapi.lib;d3dcompiler.lib;WindowsCodecs.lib;$(SolutionDir)int\GW2Common\$(Platform)\$(Configuration)\BaseResource.res;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>$(SolutionDir)Main.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>if exist "$(GW2RADIAL_TARGET_DIR)" (
-  copy /Y $(TargetPath) "$(GW2RADIAL_TARGET_DIR)\addons\gw2radial\$(TargetName).dll"
-  copy /Y $(OutDir)$(TargetName).pdb "$(GW2RADIAL_TARGET_DIR)\addons\gw2radial\$(TargetName).pdb"
+  copy /Y $(TargetPath) "$(GW2RADIAL_TARGET_DIR)\addons\$(TargetName).dll"
+  copy /Y $(OutDir)$(TargetName).pdb "$(GW2RADIAL_TARGET_DIR)\addons\$(TargetName).pdb"
 ) else (
   echo No target defined, skipping copy. To setup automatic copy, define environment variable GW2RADIAL_TARGET_DIR to your GW2 root install directory.
 )</Command>
@@ -155,6 +153,38 @@ cd "$(ProjectDir)shaders"
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\MarkerWheel.cpp" />
     <ClCompile Include="src\MountWheel.cpp" />
+    <ClCompile Include="src\NexusIntegration.cpp" />
+    <!-- ImGui 1.80 (Nexus' version) in the imgui180 namespace, for the Nexus options panel. These must not see imcfg.h. -->
+    <ClCompile Include="src\NexusOptionsUI.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;IMGUI_NEXUS_NAMESPACED;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;IMGUI_NEXUS_NAMESPACED;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>IMGUI_USER_CONFIG</UndefinePreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+    <ClCompile Include="src\imgui180\wrap_imgui.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>IMGUI_USER_CONFIG</UndefinePreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+    <ClCompile Include="src\imgui180\wrap_imgui_draw.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>IMGUI_USER_CONFIG</UndefinePreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+    <ClCompile Include="src\imgui180\wrap_imgui_tables.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>IMGUI_USER_CONFIG</UndefinePreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+    <ClCompile Include="src\imgui180\wrap_imgui_widgets.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;IMGUI_NEXUS_NAMESPACED;IMGUI_DISABLE_WIN32_FUNCTIONS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>IMGUI_USER_CONFIG</UndefinePreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
     <ClCompile Include="src\NoveltyWheel.cpp" />
     <ClCompile Include="src\Wheel.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">IMGUI_USER_CONFIG=&lt;imcfg.h&gt;;D3D_DEBUG_INFO;_DEBUG;GW2Radial_EXPORTS;_WINDOWS;_USRDLL;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;SHADERS_DIR=LR"sd($(ProjectDir)shaders\)sd";_WIN32_WINNT=0x0600;$(GitHubDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -169,6 +199,8 @@ cd "$(ProjectDir)shaders"
     <ClInclude Include="include\Main.h" />
     <ClInclude Include="include\MarkerWheel.h" />
     <ClInclude Include="include\MountWheel.h" />
+    <ClInclude Include="include\NexusIntegration.h" />
+    <ClInclude Include="include\NexusOptionsUI.h" />
     <ClInclude Include="include\NoveltyWheel.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\Wheel.h" />
@@ -179,7 +211,6 @@ cd "$(ProjectDir)shaders"
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </None>
-    <None Include="Main.def" />
     <None Include="shaders\common.hlsli" />
     <None Include="vcpkg.json" />
   </ItemGroup>

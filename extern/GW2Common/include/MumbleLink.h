@@ -68,15 +68,15 @@ public:
         Virtuoso = 25,
         Weaver = 26,
         Willbender = 27,
-        Luminary = 81,
-        Conduit = 79,
-        Paragon = 74,
-        Amalgam = 75,
-        Galeshot = 78,
-        Antiquary = 77,
-        Evoker = 80,
-        Troubadour = 73,
-        Ritualist = 76
+        Luminary = 28,
+        Conduit = 29,
+        Paragon = 30,
+        Amalgam = 31,
+        Galeshot = 32,
+        Antiquary = 33,
+        Evoker = 34,
+        Troubadour = 35,
+        Ritualist = 36
     };
 
     enum class Race : u8

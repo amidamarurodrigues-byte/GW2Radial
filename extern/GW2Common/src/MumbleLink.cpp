@@ -172,7 +172,16 @@ MumbleLink::EliteSpec MumbleLink::characterSpecialization() const {
         Vindicator = 69,
         Mechanist = 70,
         Specter = 71,
-        Untamed = 72
+        Untamed = 72,
+        Luminary = 81,
+        Conduit = 79,
+        Paragon = 74,
+        Amalgam = 75,
+        Galeshot = 78,
+        Antiquary = 77,
+        Evoker = 80,
+        Troubadour = 73,
+        Ritualist = 76,
     };
 
     switch(AnetEliteSpec(identity_.specialization)) {
